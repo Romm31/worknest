@@ -3,13 +3,16 @@
 namespace App\Livewire\Admin\Employees;
 
 use App\Models\Employee;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class EmployeeShow extends Component
 {
     public Employee $employee;
 
-    public function mount(Employee $employee)
+    public function mount(Employee $employee): void
     {
         $this->employee = $employee->load([
             'user',
@@ -24,15 +27,11 @@ class EmployeeShow extends Component
         ]);
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
-        return view('livewire.admin.employees.employee-show')
-            ->layout('layouts.app', [
-                'sidebar' => view('components.admin-sidebar'),
-                'header' => 'Employee Details',
-            ]);
+        return view('livewire.admin.employees.employee-show', [
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Employee Details',
+        ]);
     }
 }

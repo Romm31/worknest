@@ -3,24 +3,25 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Attendance;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\ActivityLog;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class AdminDashboard extends Component
 {
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         // Statistics
         $totalEmployees = Employee::where('status', 'active')->count();
         $todayAttendance = Attendance::today()->count();
         $pendingLeaveRequests = LeaveRequest::pending()->count();
-        $totalDepartments = \App\Models\Department::where('is_active', true)->count();
+        $totalDepartments = Department::where('is_active', true)->count();
 
         // Calculate attendance rate
         $attendanceRate = $totalEmployees > 0
@@ -59,9 +60,8 @@ class AdminDashboard extends Component
             'recentActivities' => $recentActivities,
             'recentLeaveRequests' => $recentLeaveRequests,
             'weeklyAttendance' => $weeklyAttendance,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Dashboard',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Dashboard',
+        ]);
     }
 }

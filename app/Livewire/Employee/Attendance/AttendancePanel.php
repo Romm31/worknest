@@ -5,8 +5,11 @@ namespace App\Livewire\Employee\Attendance;
 use App\Models\ActivityLog;
 use App\Models\Attendance;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class AttendancePanel extends Component
 {
     public function checkIn(): void
@@ -65,10 +68,7 @@ class AttendancePanel extends Component
         session()->flash('success', 'Successfully checked out at ' . Carbon::now()->format('H:i:s'));
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $employee = auth()->user()->employee;
         $todayAttendance = $employee?->todayAttendance;
@@ -80,9 +80,8 @@ class AttendancePanel extends Component
             'currentTime' => $currentTime,
             'canCheckIn' => $employee && !$employee->hasCheckedInToday,
             'canCheckOut' => $employee && $employee->hasCheckedInToday && !$employee->hasCheckedOutToday,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.employee-sidebar'),
-                    'header' => 'Check In / Out',
-                ]);
+            'sidebar' => view('components.employee-sidebar')->render(),
+            'header' => 'Check In / Out',
+        ]);
     }
 }

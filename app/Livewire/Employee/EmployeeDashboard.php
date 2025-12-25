@@ -4,24 +4,22 @@ namespace App\Livewire\Employee;
 
 use App\Models\Attendance;
 use App\Models\LeaveRequest;
-use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class EmployeeDashboard extends Component
 {
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $employee = auth()->user()->employee;
 
         if (!$employee) {
-            return view('livewire.employee.no-profile')
-                ->layout('layouts.app', [
-                    'sidebar' => view('components.employee-sidebar'),
-                    'header' => 'Dashboard',
-                ]);
+            return view('livewire.employee.no-profile', [
+                'sidebar' => view('components.employee-sidebar')->render(),
+                'header' => 'Dashboard',
+            ]);
         }
 
         // Today's attendance
@@ -56,9 +54,8 @@ class EmployeeDashboard extends Component
             'pendingLeaveRequests' => $pendingLeaveRequests,
             'recentAttendance' => $recentAttendance,
             'recentLeaveRequests' => $recentLeaveRequests,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.employee-sidebar'),
-                    'header' => 'Dashboard',
-                ]);
+            'sidebar' => view('components.employee-sidebar')->render(),
+            'header' => 'Dashboard',
+        ]);
     }
 }

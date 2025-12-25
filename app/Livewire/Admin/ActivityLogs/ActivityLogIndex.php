@@ -3,10 +3,12 @@
 namespace App\Livewire\Admin\ActivityLogs;
 
 use App\Models\ActivityLog;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class ActivityLogIndex extends Component
 {
     use WithPagination;
@@ -19,10 +21,7 @@ class ActivityLogIndex extends Component
         $this->resetPage();
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $logs = ActivityLog::with('user')
             ->when($this->search, function ($query) {
@@ -39,9 +38,8 @@ class ActivityLogIndex extends Component
         return view('livewire.admin.activity-logs.activity-log-index', [
             'logs' => $logs,
             'actions' => ActivityLog::ACTIONS,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Activity Logs',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Activity Logs',
+        ]);
     }
 }

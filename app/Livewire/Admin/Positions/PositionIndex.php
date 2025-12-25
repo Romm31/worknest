@@ -4,44 +4,47 @@ namespace App\Livewire\Admin\Positions;
 
 use App\Models\ActivityLog;
 use App\Models\Position;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class PositionIndex extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $showModal = false;
-    public $showDeleteModal = false;
-    public $editMode = false;
+    public string $search = '';
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public bool $editMode = false;
 
-    public $positionId;
-    public $name;
-    public $code;
-    public $description;
-    public $is_active = true;
+    public ?int $positionId = null;
+    public string $name = '';
+    public string $code = '';
+    public ?string $description = null;
+    public bool $is_active = true;
 
-    protected $rules = [
+    protected array $rules = [
         'name' => 'required|string|max:255',
         'code' => 'required|string|max:10|unique:positions,code',
         'description' => 'nullable|string|max:1000',
         'is_active' => 'boolean',
     ];
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function openModal()
+    public function openModal(): void
     {
         $this->reset(['positionId', 'name', 'code', 'description', 'is_active', 'editMode']);
         $this->is_active = true;
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $position = Position::findOrFail($id);
         $this->positionId = $position->id;
@@ -53,7 +56,7 @@ class PositionIndex extends Component
         $this->showModal = true;
     }
 
-    public function save()
+    public function save(): void
     {
         $rules = $this->rules;
 
@@ -89,13 +92,13 @@ class PositionIndex extends Component
         $this->reset(['showModal', 'positionId', 'name', 'code', 'description', 'is_active', 'editMode']);
     }
 
-    public function confirmDelete($id)
+    public function confirmDelete(int $id): void
     {
         $this->positionId = $id;
         $this->showDeleteModal = true;
     }
 
-    public function delete()
+    public function delete(): void
     {
         $position = Position::findOrFail($this->positionId);
 
@@ -114,10 +117,7 @@ class PositionIndex extends Component
         $this->positionId = null;
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $positions = Position::query()
             ->when($this->search, function ($query) {
@@ -130,9 +130,8 @@ class PositionIndex extends Component
 
         return view('livewire.admin.positions.position-index', [
             'positions' => $positions,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Positions',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Positions',
+        ]);
     }
 }

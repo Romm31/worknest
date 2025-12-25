@@ -4,44 +4,47 @@ namespace App\Livewire\Admin\Departments;
 
 use App\Models\ActivityLog;
 use App\Models\Department;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class DepartmentIndex extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $showModal = false;
-    public $showDeleteModal = false;
-    public $editMode = false;
+    public string $search = '';
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public bool $editMode = false;
 
-    public $departmentId;
-    public $name;
-    public $code;
-    public $description;
-    public $is_active = true;
+    public ?int $departmentId = null;
+    public string $name = '';
+    public string $code = '';
+    public ?string $description = null;
+    public bool $is_active = true;
 
-    protected $rules = [
+    protected array $rules = [
         'name' => 'required|string|max:255',
         'code' => 'required|string|max:10|unique:departments,code',
         'description' => 'nullable|string|max:1000',
         'is_active' => 'boolean',
     ];
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function openModal()
+    public function openModal(): void
     {
         $this->reset(['departmentId', 'name', 'code', 'description', 'is_active', 'editMode']);
         $this->is_active = true;
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $department = Department::findOrFail($id);
         $this->departmentId = $department->id;
@@ -53,7 +56,7 @@ class DepartmentIndex extends Component
         $this->showModal = true;
     }
 
-    public function save()
+    public function save(): void
     {
         $rules = $this->rules;
 
@@ -89,13 +92,13 @@ class DepartmentIndex extends Component
         $this->reset(['showModal', 'departmentId', 'name', 'code', 'description', 'is_active', 'editMode']);
     }
 
-    public function confirmDelete($id)
+    public function confirmDelete(int $id): void
     {
         $this->departmentId = $id;
         $this->showDeleteModal = true;
     }
 
-    public function delete()
+    public function delete(): void
     {
         $department = Department::findOrFail($this->departmentId);
 
@@ -115,10 +118,7 @@ class DepartmentIndex extends Component
         $this->departmentId = null;
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $departments = Department::query()
             ->when($this->search, function ($query) {
@@ -131,9 +131,8 @@ class DepartmentIndex extends Component
 
         return view('livewire.admin.departments.department-index', [
             'departments' => $departments,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Departments',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Departments',
+        ]);
     }
 }

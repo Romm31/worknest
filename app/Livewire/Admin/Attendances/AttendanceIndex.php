@@ -5,9 +5,12 @@ namespace App\Livewire\Admin\Attendances;
 use App\Models\Attendance;
 use App\Models\Department;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class AttendanceIndex extends Component
 {
     use WithPagination;
@@ -33,10 +36,7 @@ class AttendanceIndex extends Component
         $this->filterDate = Carbon::today()->format('Y-m-d');
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $attendances = Attendance::with(['employee.user', 'employee.department'])
             ->when($this->search, function ($query) {
@@ -66,9 +66,8 @@ class AttendanceIndex extends Component
         return view('livewire.admin.attendances.attendance-index', [
             'attendances' => $attendances,
             'departments' => Department::active()->get(),
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Attendance Records',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Attendance Records',
+        ]);
     }
 }

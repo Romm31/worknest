@@ -7,35 +7,39 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class EmployeeIndex extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $filterDepartment = '';
-    public $filterStatus = '';
-    public $showModal = false;
-    public $showDeleteModal = false;
-    public $editMode = false;
+    public string $search = '';
+    public string $filterDepartment = '';
+    public string $filterStatus = '';
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public bool $editMode = false;
 
-    public $employeeId;
-    public $name;
-    public $email;
-    public $password;
-    public $department_id;
-    public $position_id;
-    public $phone;
-    public $address;
-    public $date_of_birth;
-    public $gender;
-    public $hire_date;
-    public $status = 'active';
+    public ?int $employeeId = null;
+    public string $name = '';
+    public string $email = '';
+    public string $password = '';
+    public ?int $department_id = null;
+    public ?int $position_id = null;
+    public ?string $phone = null;
+    public ?string $address = null;
+    public ?string $date_of_birth = null;
+    public ?string $gender = null;
+    public ?string $hire_date = null;
+    public string $status = 'active';
 
-    protected function rules()
+    protected function rules(): array
     {
         $rules = [
             'name' => 'required|string|max:255',
@@ -61,12 +65,12 @@ class EmployeeIndex extends Component
         return $rules;
     }
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function openModal()
+    public function openModal(): void
     {
         $this->reset(['employeeId', 'name', 'email', 'password', 'department_id', 'position_id', 'phone', 'address', 'date_of_birth', 'gender', 'hire_date', 'status', 'editMode']);
         $this->status = 'active';
@@ -74,7 +78,7 @@ class EmployeeIndex extends Component
         $this->showModal = true;
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
         $employee = Employee::with('user')->findOrFail($id);
         $this->employeeId = $employee->id;
@@ -92,7 +96,7 @@ class EmployeeIndex extends Component
         $this->showModal = true;
     }
 
-    public function save()
+    public function save(): void
     {
         $this->validate();
 
@@ -155,13 +159,13 @@ class EmployeeIndex extends Component
         $this->reset(['showModal', 'employeeId', 'name', 'email', 'password', 'department_id', 'position_id', 'phone', 'address', 'date_of_birth', 'gender', 'hire_date', 'status', 'editMode']);
     }
 
-    public function confirmDelete($id)
+    public function confirmDelete(int $id): void
     {
         $this->employeeId = $id;
         $this->showDeleteModal = true;
     }
 
-    public function delete()
+    public function delete(): void
     {
         $employee = Employee::with('user')->findOrFail($this->employeeId);
 
@@ -175,10 +179,7 @@ class EmployeeIndex extends Component
         $this->employeeId = null;
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $employees = Employee::with(['user', 'department', 'position'])
             ->when($this->search, function ($query) {
@@ -200,9 +201,8 @@ class EmployeeIndex extends Component
             'employees' => $employees,
             'departments' => Department::active()->get(),
             'positions' => Position::active()->get(),
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Employees',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Employees',
+        ]);
     }
 }

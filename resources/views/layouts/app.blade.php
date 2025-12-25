@@ -50,7 +50,11 @@
 
             <!-- Navigation -->
             <nav class="px-4 py-6 space-y-1 overflow-y-auto h-[calc(100vh-180px)]">
-                {!! $sidebar ?? '' !!}
+                @if(request()->is('admin/*') || request()->routeIs('admin.*'))
+                    @include('components.admin-sidebar')
+                @else
+                    @include('components.employee-sidebar')
+                @endif
             </nav>
 
             <!-- User info (bottom) -->
@@ -93,7 +97,7 @@
 
                     <!-- Page title -->
                     <h2 class="text-xl font-semibold text-slate-900 dark:text-zinc-100">
-                        {{ $header ?? 'Dashboard' }}
+                        {{ $header ?? $title ?? 'Dashboard' }}
                     </h2>
                 </div>
 

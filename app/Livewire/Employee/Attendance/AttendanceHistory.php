@@ -4,9 +4,12 @@ namespace App\Livewire\Employee\Attendance;
 
 use App\Models\Attendance;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class AttendanceHistory extends Component
 {
     use WithPagination;
@@ -18,10 +21,7 @@ class AttendanceHistory extends Component
         $this->filterMonth = Carbon::now()->format('Y-m');
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $employee = auth()->user()->employee;
 
@@ -53,9 +53,8 @@ class AttendanceHistory extends Component
         return view('livewire.employee.attendance.attendance-history', [
             'attendances' => $attendances,
             'monthStats' => $monthStats,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.employee-sidebar'),
-                    'header' => 'Attendance History',
-                ]);
+            'sidebar' => view('components.employee-sidebar')->render(),
+            'header' => 'Attendance History',
+        ]);
     }
 }

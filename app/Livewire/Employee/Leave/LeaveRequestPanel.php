@@ -4,9 +4,12 @@ namespace App\Livewire\Employee\Leave;
 
 use App\Models\ActivityLog;
 use App\Models\LeaveRequest;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class LeaveRequestPanel extends Component
 {
     use WithPagination;
@@ -84,10 +87,7 @@ class LeaveRequestPanel extends Component
         $this->deleteId = null;
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $employee = auth()->user()->employee;
 
@@ -98,9 +98,8 @@ class LeaveRequestPanel extends Component
         return view('livewire.employee.leave.leave-request-panel', [
             'requests' => $requests,
             'types' => LeaveRequest::TYPES,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.employee-sidebar'),
-                    'header' => 'Leave Requests',
-                ]);
+            'sidebar' => view('components.employee-sidebar')->render(),
+            'header' => 'Leave Requests',
+        ]);
     }
 }

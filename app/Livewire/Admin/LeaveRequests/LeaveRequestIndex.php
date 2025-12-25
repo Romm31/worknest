@@ -4,34 +4,37 @@ namespace App\Livewire\Admin\LeaveRequests;
 
 use App\Models\ActivityLog;
 use App\Models\LeaveRequest;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.app')]
 class LeaveRequestIndex extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    public $filterStatus = 'pending';
-    public $filterType = '';
+    public string $search = '';
+    public string $filterStatus = 'pending';
+    public string $filterType = '';
 
-    public $showModal = false;
-    public $selectedRequest;
-    public $rejectionReason = '';
+    public bool $showModal = false;
+    public ?LeaveRequest $selectedRequest = null;
+    public string $rejectionReason = '';
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function viewRequest($id)
+    public function viewRequest(int $id): void
     {
         $this->selectedRequest = LeaveRequest::with(['employee.user', 'employee.department', 'approver'])->find($id);
         $this->rejectionReason = '';
         $this->showModal = true;
     }
 
-    public function approve()
+    public function approve(): void
     {
         if (!$this->selectedRequest)
             return;
@@ -45,7 +48,7 @@ class LeaveRequestIndex extends Component
         $this->selectedRequest = null;
     }
 
-    public function reject()
+    public function reject(): void
     {
         $this->validate([
             'rejectionReason' => 'required|string|min:10|max:500',
@@ -64,10 +67,7 @@ class LeaveRequestIndex extends Component
         $this->rejectionReason = '';
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\View|\Livewire\Component
-     */
-    public function render(): mixed
+    public function render(): View
     {
         $requests = LeaveRequest::with(['employee.user', 'employee.department'])
             ->when($this->search, function ($query) {
@@ -86,9 +86,8 @@ class LeaveRequestIndex extends Component
 
         return view('livewire.admin.leave-requests.leave-request-index', [
             'requests' => $requests,
-        ])->layout('layouts.app', [
-                    'sidebar' => view('components.admin-sidebar'),
-                    'header' => 'Leave Requests',
-                ]);
+            'sidebar' => view('components.admin-sidebar')->render(),
+            'header' => 'Leave Requests',
+        ]);
     }
 }
