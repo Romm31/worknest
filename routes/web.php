@@ -34,7 +34,10 @@ use Laravel\Fortify\Features;
 */
 
 Route::get('/', function () {
-    return view('landing');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 })->name('home');
 
 /*
