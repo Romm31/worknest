@@ -34,7 +34,7 @@ use Laravel\Fortify\Features;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing');
 })->name('home');
 
 /*

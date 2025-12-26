@@ -88,9 +88,9 @@ class EmployeeIndex extends Component
         $this->position_id = $employee->position_id;
         $this->phone = $employee->phone;
         $this->address = $employee->address;
-        $this->date_of_birth = $employee->date_of_birth?->format('Y-m-d');
+        $this->date_of_birth = $employee->date_of_birth ? Carbon::parse($employee->date_of_birth)->format('Y-m-d') : null;
         $this->gender = $employee->gender;
-        $this->hire_date = $employee->hire_date->format('Y-m-d');
+        $this->hire_date = $employee->hire_date ? Carbon::parse($employee->hire_date)->format('Y-m-d') : null;
         $this->status = $employee->status;
         $this->editMode = true;
         $this->showModal = true;
